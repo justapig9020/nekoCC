@@ -21,11 +21,14 @@ int  main ()
             puts ("NULL!");
             break;
         }
-        print_token (t);
         if (t->type == EF) {
             puts ("EOF!");
             break;
         }
+        print_token (t);
+        free (t);
     }
+    free (t);
+    t = NULL;
     return 0;
 }

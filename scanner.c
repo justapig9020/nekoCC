@@ -12,13 +12,13 @@ int get_anno () {
     } else if (c == '*'){
         while (1) {
             while ((c = getchar ()) != '*');
-            if (getchar () == '/')
+            if ((c = getchar ()) == '/')
                 break;
         }
     } else {
         ungetc (c, stdin);
     }
-    return 0;
+    return 1;
 }
 
 int get_garbage (char c)
@@ -106,9 +106,6 @@ token *get_sym (char c)
         case '-':
             t->type = MINU;
             break;
-        case '\'':
-            t->type = APO;
-            break;
         case '(':
             t->type = LPAR;
             break;
@@ -131,6 +128,7 @@ token *get_sym (char c)
             t->type = EF;
             break;
         default:
+            printf ("default:%c\n", c);
             return NULL;
             break;
     }
@@ -141,6 +139,7 @@ token *get_equ (char c)
 {
     token *t;
     char *s;
+    char cbuf;
     t = malloc (sizeof (token));
     s = malloc (3);
     s[0] = c;
@@ -164,6 +163,7 @@ token *get_equ (char c)
             if (c == '=') {
                 s[1] = '=';
                 s[2] = '\0';
+                t->s = s;
                 t->type = EQU;
             } else {
                 ungetc (c, stdin);
@@ -173,10 +173,17 @@ token *get_equ (char c)
             break;
         case '>':
         case '<':
+            cbuf = c;
             c = getchar ();
             if (c == '=') {
                 s[1] = '=';
                 s[2] = '\0';
+            } else if (c == cbuf) {
+                s[1] = c;
+                s[2] = '\0';
+                t->s = s;
+                t->type = SHIFT;
+                break;
             } else {
                 s[1] = '\0';
                 ungetc (c, stdin);
@@ -185,8 +192,52 @@ token *get_equ (char c)
             t->type = EQU;
             break;
     }
-    free (s);
-    s = NULL;
+    return t;
+}
+
+token *get_char ()
+{
+    token *t;
+    char *s;
+    char c;
+    t = malloc (sizeof (t));
+    s = malloc (3);
+    s[0] = getchar();
+    t->s = s;
+    t->s[1] = '\0';
+    if (t->s[0] == '\\') {
+        t->s[1] = getchar ();
+        t->s[2] = '\0';
+    }
+    t->type = CHAR;
+    printf ("char %c\n", t->s[0]);
+    if ((c = getchar ()) != '\'') {
+        free (t->s);
+        free (t);
+        return NULL;
+    }
+    return t;
+}
+
+token *get_string ()
+{
+    token *t;
+    char *s;
+    int i;
+    t = malloc (sizeof (t));
+    s = malloc (sizeof (255));
+    i = 0;
+    while (1) {
+        s[i] = getchar ();
+        if (s[i] == '\\')
+            s[++i] = getchar ();
+        if (s[i] == '"')
+            break;
+        i++;
+    }
+    s[i] = '\0';
+    t->s = s;
+    t->type = STRING;
     return t;
 }
 
@@ -211,6 +262,12 @@ token *next_token ()
         case '<':
         case '!':
             return get_equ (c);
+        case '\'':
+            return get_char ();
+            break;
+        case '"':
+            return get_string ();
+            break;
         default:
             return get_sym (c);
             break;
