@@ -91,9 +91,6 @@ token *get_sym (char c)
         case ':':
             t->type = COLON;
             break;
-        case '&':
-            t->type = AND;
-            break;
         case '*':
             t->type = MUL;
             break;
@@ -241,6 +238,28 @@ token *get_string ()
     return t;
 }
 
+token *get_bool (char c)
+{
+    token *t;
+    char *s;
+    t = malloc (sizeof (t));
+    s = malloc (3);
+    s[0] = c;
+    c = getchar ();
+    if (c == s[0]) {
+        s[1] = c;
+        s[2] = '\0';
+        t->s = s;
+        t->type = BOOL;
+    } else {
+        ungetc (c, stdin);
+        s[1] = '\0';
+        t->s = s;
+        t->type = s[0] == '&'? AND:OR;
+    }
+    return t;
+}
+
 token *next_token ()
 {
     char c;
@@ -267,6 +286,10 @@ token *next_token ()
             break;
         case '"':
             return get_string ();
+            break;
+        case '&':
+        case '|':
+            return get_bool (c);
             break;
         default:
             return get_sym (c);
