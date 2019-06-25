@@ -3,9 +3,9 @@
 #include "CCtype.h"
 #include "struct.h"
 
-extern List* get_program ();
-//extern token *next_token ();
-/*
+//extern List* get_program ();
+extern token *next_token ();
+
 void print_token (token *t)
 {
     if (t->type == NUM) {
@@ -14,16 +14,16 @@ void print_token (token *t)
         printf ("\n+++++\ntype = %d\nstring = %s\n", t->type, t->s);
     }
 }
-*/
+
 int  main ()
 {
-    List *prog;
+   /* List *prog;
     prog = get_program ();
     show_list (prog);
     return 0;
 }
     
-/*
+*/
     token *t;
     while (1) {
         t = next_token ();
@@ -41,4 +41,4 @@ int  main ()
     free (t);
     t = NULL;
     return 0;
-}*/
+}

@@ -2,14 +2,26 @@
 #define _CCTYPE_H_
 
 enum {
-    INT = 1,
-    INT_PTR,
-    CHAR,
-    CHAR_PTR
+    STR_FUNC,
+    STR_STATE,
+    STR_DECL,
+    STR_ASSI,
+    STR_FUN_CAL,
+    STR_SESS,
+    STR_IF,
+    STR_FOR,
+    STR_RET
 };
 
 enum {
-    ID ,
+    TYPE_INT = 1,
+    TYPE_INT_PTR,
+    TYPE_CHAR,
+    TYPE_CHAR_PTR
+};
+
+enum {
+    ID = 1 ,
     NUM ,
     COLON ,
     OR , 
@@ -18,6 +30,7 @@ enum {
     DIV ,
     PLUS ,
     MINU ,
+    MOD ,
     CHAR ,
     STRING ,
     LPAR ,
@@ -32,10 +45,6 @@ enum {
     BOOL ,
     EF 
 };
-
-enum {
-    
-}
 
 typedef struct {
     union { 

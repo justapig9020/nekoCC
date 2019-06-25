@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "CCtype.h"
-
-//extern void alert (char *s);
+#include "alert.h"
 
 int get_anno () {
     char c = getchar ();
@@ -102,6 +101,9 @@ token *get_sym (char c)
             break;
         case '-':
             t->type = MINU;
+            break;
+        case '%':
+            t->type = MOD;
             break;
         case '(':
             t->type = LPAR;
