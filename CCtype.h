@@ -2,6 +2,21 @@
 #define _CCTYPE_H_
 
 enum {
+    OPT_LPAR,
+    OPT_RPAR,
+    OPT_PLUS,
+    OPT_MUL,
+    OPT_BAND,
+    OPT_BXOR,
+    OPT_BOR
+};
+
+enum {
+    LV_ID,
+    LV_PTR
+};
+
+enum {
     STR_FUNC,
     STR_STATE,
     STR_DECL,
@@ -10,7 +25,9 @@ enum {
     STR_SESS,
     STR_IF,
     STR_FOR,
-    STR_RET
+    STR_RET,
+    STR_GOTO,
+    STR_TOK
 };
 
 enum {
@@ -24,6 +41,7 @@ enum {
     ID = 1 ,
     NUM ,
     COLON ,
+    XOR ,
     OR , 
     AND ,
     MUL ,
@@ -43,16 +61,9 @@ enum {
     EQU ,
     SHIFT ,
     BOOL ,
-    EF 
+    EF ,
+    ADDR ,
+    REFE
 };
-
-typedef struct {
-    union { 
-        char *s;
-        int n;
-    };
-    int type;
-} token;
-
 
 #endif

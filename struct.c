@@ -22,6 +22,75 @@ inline List *new_list ()
     return l;
 }
 
+inline Func *new_func () 
+{
+    Func *f;
+    f = malloc (sizeof (Func));
+    f->arg_list = new_list ();
+    f->state_list = new_list ();
+    f->vari_list = new_list ();
+    return f;
+}
+
+inline Lv *new_lv (char *n, int t)
+{
+    Lv *l;
+    l = malloc (sizeof (Lv));
+    l->name = n;
+    l->type = t;
+    return l;
+}
+
+inline Assi *new_assi (Lv *l, List *r)
+{
+    Assi *a;
+    a = malloc (sizeof (Assi));
+    a->rval = r;
+    a->lval = l;
+    return a;
+}
+
+inline Fun_Cal *new_fun_cal (List *arg, char *n)
+{
+    Fun_Cal *f;
+    f = malloc (sizeof (Fun_Cal));
+    f->argp_list = arg;
+    f->name = n;
+    return f;
+}
+
+inline If *new_if (List *c, List* s)
+{
+    If *i;
+    i = malloc (sizeof (If));
+    i->cmp_list = c;
+    i->state_list = s;
+    i->else_if = NULL;
+    return i;
+}
+
+inline For *new_for (List *i, List *c, List *s, List *t) 
+{
+    For *f;
+    f = malloc (sizeof (For));
+    f->init_list = i;
+    f->cmp_list = c;
+    f->step_list = s;
+    f->state_list = t;
+    return f;
+}
+
+void insert_head (List *l, void *c, int t)
+{
+    Node *n;
+    n = malloc (sizeof (Node));
+    n->cont = c;
+    n->type = t;
+    n->next = l->head;
+    l->head = n;
+    l->len ++;
+}
+
 void insert_tail (List *l, void *c, int t)
 {
     Node *n;
@@ -37,16 +106,6 @@ void insert_tail (List *l, void *c, int t)
         l->tail = n;
     }
     l->len ++;
-}
-
-inline Func *new_func () 
-{
-    Func *f;
-    f = malloc (sizeof (Func));
-    f->arg_list = new_list ();
-    f->state_list = new_list ();
-    f->vari_list = new_list ();
-    return f;
 }
 
 char *type_2_string (int y)
@@ -76,8 +135,14 @@ void show_list (List *l)
         switch ((*ptr)->type) {
             case STR_FUNC:
                 printf ("Function: %s\n", ((Func*)(*ptr)->cont)->name);
+                printf ("ret_type: %s\n", type_2_string(((Func*)(*ptr)->cont)->ret_type));
                 puts ("arg_list:");
                 show_list (((Func*)(*ptr)->cont)->arg_list);
+                puts ("vari_list:");
+                show_list (((Func*)(*ptr)->cont)->vari_list);
+                puts ("state_list:");
+                show_list (((Func*)(*ptr)->cont)->state_list);
+                puts ("================");
                 break;
             case STR_STATE:
                 break;
@@ -85,6 +150,11 @@ void show_list (List *l)
                 printf ("%s %s\n", type_2_string(((Decl*)(*ptr)->cont)->type),((Decl*)(*ptr)->cont)->name);
                 break;
             case STR_ASSI:
+                puts ("ASSI");
+                show_lv (((Assi*)(*ptr)->cont)->lval);
+                printf (" = ");
+                show_list (((Assi*)(*ptr)->cont)->rval);
+                puts (" ");
                 break;
             case STR_FUN_CAL:
                 break;
@@ -96,8 +166,115 @@ void show_list (List *l)
                 break;
             case STR_RET:
                 break;
-
+            case STR_GOTO:
+                break;
+            case STR_TOK:
+                //printf ("%d", ((token*)(*ptr)->cont)->type);
+                if (((token*)(*ptr)->cont)->type == NUM)
+                    printf ("%d ", ((token*)(*ptr)->cont)->n);
+                else 
+                    printf ("%s ", ((token*)(*ptr)->cont)->s);
+                break;
         }
         ptr = &((*ptr)->next);
     }
+}
+
+void show_token (token *t)
+{
+    char *s;
+    switch  (t->type) {
+        case ID:
+            s = "ID";
+            break;
+        case NUM:
+            s = "NUM";
+            break;
+        case COLON:
+            s = "COLON";
+            break;
+        case XOR:
+            s = "XOR";
+            break;
+        case OR:
+            s = "OR";
+            break; 
+        case AND:
+            s = "AND";
+            break;
+        case MUL:
+            s = "MUL";
+            break;
+        case DIV:
+            s = "DIV";
+            break;
+        case PLUS:
+            s = "PLUS";
+            break;
+        case MINU:
+            s = "MINU";
+            break;
+        case MOD:
+            s = "MOD";
+            break;
+        case CHAR:
+            s = "CHAR";
+            break;
+        case STRING:
+            s = "STRING";
+            break;
+        case LPAR:
+            s = "LPAR";
+            break;
+        case RPAR:
+            s = "RPAR";
+            break;
+        case LBPAR:
+            s = "LBPAR";
+            break;
+        case RBPAR:
+            s = "RBPAR";
+            break;
+        case SEMI:
+            s = "SEMI";
+            break;
+        case COM:
+            s = "COM";
+            break;
+        case ASSI:
+            s = "ASSI";
+            break;
+        case EQU:
+            s = "EQU";
+            break;
+        case SHIFT:
+            s = "SHIFT";
+            break;
+        case BOOL:
+            s = "BOOL";
+            break;
+        case EF:
+            s = "EOF";
+            break;
+        case ADDR:
+            s = "ADDR";
+            break;
+        case REFE:
+            s = "REFE";
+            break;
+    }
+    printf ("%s: ", s);
+    if (t->type == NUM)
+        printf ("%d\n", t->n);
+    else
+        printf ("%s\n", t->s);
+}
+
+void show_lv (Lv *l) {
+    switch (l->type) {
+        case LV_PTR:
+            printf ("*");
+            break;
+    }
+    printf ("%s", l->name);
 }
