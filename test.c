@@ -1,8 +1,8 @@
 char func1 (int a1, char a2){
     int a;
     char b;
-    //b = -1;
-    //a = a+1-b;
+    b = -1;
+    a = a+1-b;
 }
 
 int* func2 (char a1){
