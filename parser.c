@@ -169,9 +169,11 @@ void get_next_id (List *r, int type)
         alert ("Wrong right value1");
     switch (type)
     {
-        case AND:
         case MUL:
-            t->type = ADDR + type - AND;
+            t->type = ADDR;
+            break;
+        case AND:
+            t->type = REFE;
             break;
         case MINU:
             //printf ("minu\n");
@@ -229,15 +231,15 @@ void get_opt (List *r, List *l, token *t)
             break;
         }
 	}
-	if (n->type == RPAR) {
-		free ((token*)n->cont);
-        free (n);
+	if (n->type == OPT_RPAR) {
+        //free ((token*)n->cont);
+        //free (n);
 		ptr = l->head;
         if (((token*)l->head->cont)->type != LPAR)
             alert ("Unexecpted RPAR");
 		l->head = ptr->next;
-        free ((token*)ptr->cont);
-		free (ptr);
+        //free ((token*)ptr->cont);
+		//free (ptr);
 	} else { 
         n->next = l->head;
     	l->head = n;
@@ -273,7 +275,6 @@ List *get_rv ()
             case MUL:
             case PLUS:
             case MINU:
-                //printf ("lt: %d\n", lt);
                 switch (lt) {
                     case ID:
                     case NUM:
@@ -297,8 +298,8 @@ List *get_rv ()
             default:
                 alert ("Wrong right-value2");
         }
-        if ((token*)rv->tail)
-            lt = ((token*)rv->tail->cont)->type;
+        if (t->type != RPAR && t->type != LPAR)
+            lt = t->type;
     }
     return NULL;
 }

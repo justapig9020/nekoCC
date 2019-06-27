@@ -172,7 +172,11 @@ void show_list (List *l)
                 //printf ("%d", ((token*)(*ptr)->cont)->type);
                 if (((token*)(*ptr)->cont)->type == NUM)
                     printf ("%d ", ((token*)(*ptr)->cont)->n);
-                else 
+                else if (((token*)(*ptr)->cont)->type == ADDR)
+                    printf ("*%s ", ((token*)(*ptr)->cont)->s);
+                else if (((token*)(*ptr)->cont)->type == REFE)
+                    printf ("&%s ", ((token*)(*ptr)->cont)->s);
+                else
                     printf ("%s ", ((token*)(*ptr)->cont)->s);
                 break;
         }
