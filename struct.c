@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "CCtype.h"
 #include "struct.h"
+#include "alert.h"
 
 inline Decl *new_decl ()
 {
@@ -108,6 +110,26 @@ void insert_tail (List *l, void *c, int t)
     l->len ++;
 }
 
+void insert_sym (List *l, void *c, char *s, int t)
+{
+    Node  **ptr;
+    ptr = &(l->head);
+    while (*ptr) {
+        switch ((*ptr)->type) {
+            case STR_DECL:
+                if (strcmp(((Decl*)(*ptr)->cont)->name, s) == 0)
+                    alert ("Same variable name");
+                break;
+            case STR_FUNC:
+                if (strcmp(((Func*)(*ptr)->cont)->name, s) == 0)
+                    alert ("Same Function name");
+                break;
+        }
+        ptr = &((*ptr)->next);
+    }
+    insert_tail (l, c, t);
+}
+
 char *type_2_string (int y)
 {
     switch (y) {
@@ -135,12 +157,14 @@ void show_list (List *l)
         switch ((*ptr)->type) {
             case STR_FUNC:
                 printf ("Function: %s\n", ((Func*)(*ptr)->cont)->name);
-                printf ("ret_type: %s\n", type_2_string(((Func*)(*ptr)->cont)->ret_type));
-                puts ("arg_list:");
+                printf ("ret type: %s\n", type_2_string(((Func*)(*ptr)->cont)->ret_type));
+                puts ("arg list:");
                 show_list (((Func*)(*ptr)->cont)->arg_list);
-                puts ("vari_list:");
+                puts ("--");
+                puts ("vari list:");
                 show_list (((Func*)(*ptr)->cont)->vari_list);
-                puts ("state_list:");
+                puts ("--");
+                puts ("state list:");
                 show_list (((Func*)(*ptr)->cont)->state_list);
                 puts ("================");
                 break;
@@ -150,23 +174,34 @@ void show_list (List *l)
                 printf ("%s %s\n", type_2_string(((Decl*)(*ptr)->cont)->type),((Decl*)(*ptr)->cont)->name);
                 break;
             case STR_ASSI:
-                puts ("ASSI");
+                puts ("Assign:");
                 show_lv (((Assi*)(*ptr)->cont)->lval);
                 printf (" = ");
                 show_list (((Assi*)(*ptr)->cont)->rval);
                 puts (" ");
                 break;
             case STR_FUN_CAL:
+                puts ("------");
+                puts ("Function call:");
+                printf ("name: %s\n", ((Fun_Cal*)(*ptr)->cont)->name);
+                puts ("arg pass list:");
+                show_list (((Fun_Cal*)(*ptr)->cont)->argp_list);
+                puts ("------");
                 break;
             case STR_SESS:
+                printf ("Session: %s\n", (char*)((*ptr)->cont));
                 break;
             case STR_IF:
                 break;
             case STR_FOR:
                 break;
             case STR_RET:
+                printf ("Return:");
+                show_list ((List*)(*ptr)->cont);
+                puts (" ");
                 break;
             case STR_GOTO:
+                printf ("Goto: %s\n", ((char*)(*ptr)->cont));
                 break;
             case STR_TOK:
                 //printf ("%d", ((token*)(*ptr)->cont)->type);
@@ -178,6 +213,10 @@ void show_list (List *l)
                     printf ("&%s ", ((token*)(*ptr)->cont)->s);
                 else
                     printf ("%s ", ((token*)(*ptr)->cont)->s);
+                break;
+            case STR_LIST:
+                show_list (((List*)(*ptr)->cont));
+                puts (" ");
                 break;
         }
         ptr = &((*ptr)->next);

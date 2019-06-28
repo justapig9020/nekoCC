@@ -43,8 +43,6 @@ bool is_token (int y)
 {
     token *t = get_token ();
     bool r = false;
-    //show_token (t);
-    //printf ("type:%d, %d", t->type, y);
     if (t->type == y) {
         r = true;
         if (t->type != NUM)
@@ -70,8 +68,6 @@ int get_type ()
     token *t;
     int type;
     t = get_token ();
-    //puts ("get_type");
-    //show_token (t);
     type = is_type (t);
     if (type) {
         free (t);
@@ -135,6 +131,7 @@ char *get_name ()
 
 List *get_decl_list (int y)
 {
+    //puts ("get_decl_list");
     List *l;
     token *t;
     Decl *d;
@@ -150,7 +147,7 @@ List *get_decl_list (int y)
                 free (d);
                 alert ("wrong variable name");
             }
-            insert_tail (l, (void*)d, STR_DECL);
+            insert_sym (l, (void*)d, d->name, STR_DECL);
         } else {
             return l;
         }
@@ -212,7 +209,7 @@ int get_opt_lv (token *t)
     alert ("Unexecped operator");
 }
 
-void get_opt (List *r, List *l, token *t)
+bool get_opt (List *r, List *l, token *t)
 {
     Node *n, *ptr;
     int type = get_opt_lv (t);
@@ -235,6 +232,8 @@ void get_opt (List *r, List *l, token *t)
         //free ((token*)n->cont);
         //free (n);
 		ptr = l->head;
+        if(!ptr)
+            return false;
         if (((token*)l->head->cont)->type != LPAR)
             alert ("Unexecpted RPAR");
 		l->head = ptr->next;
@@ -244,6 +243,7 @@ void get_opt (List *r, List *l, token *t)
         n->next = l->head;
     	l->head = n;
 	}
+    return true;
 }
 
 List *get_rv ()
@@ -258,15 +258,6 @@ List *get_rv ()
     while (1) {
         t = get_token ();
         switch (t->type) {
-            case SEMI:
-                ptr = (stk->head);
-	            while (ptr) {
-		            buf = ptr;
-                    insert_tail (rv, ptr->cont, STR_TOK);
-		            ptr = ptr->next;
-		            free (buf);
-	            }
-                return rv;
             case ID:
             case NUM:
                 insert_tail (rv, (void*)t, STR_TOK);
@@ -293,10 +284,21 @@ List *get_rv ()
             case MOD:
             case RPAR:
             case LPAR:
-                get_opt (rv, stk, t);
+                if (!get_opt (rv, stk, t)) { 
+                    untoken (t);
+                    return rv;
+                }
                 break;
             default:
-                alert ("Wrong right-value2");
+                ptr = (stk->head);
+	            while (ptr) {
+		            buf = ptr;
+                    insert_tail (rv, ptr->cont, STR_TOK);
+		            ptr = ptr->next;
+		            free (buf);
+	            }
+                untoken (t);
+                return rv;
         }
         if (t->type != RPAR && t->type != LPAR)
             lt = t->type;
@@ -304,8 +306,28 @@ List *get_rv ()
     return NULL;
 }
 
+List *get_rv_list ()
+{
+    List *l;
+    token *t;
+    l = new_list ();
+    while (1)
+    {
+        t = get_token ();
+        untoken (t);
+        //printf ("%d-", t->type);
+        if (t->type == RPAR){
+            return l;
+        }
+        //get_rv ();
+        insert_tail (l, (void*)get_rv (), STR_LIST);
+        is_token (COM);
+    }
+}
+
 Assi *get_assi (token *t)
 {
+    //puts ("get_assi");
     Assi *a;
     Lv *lv;
     int type;
@@ -326,13 +348,24 @@ Assi *get_assi (token *t)
     rv = get_rv ();
     if (!rv)
         alert ("Wrong right-value1");
+    if (!is_token (SEMI))
+        alert ("Unexecpt token!!");
     a = new_assi (lv, rv);
     return a;
 }
 
 char *get_goto ()
 {
-
+    //puts ("get_goto");
+    token *t;
+    char *s;
+    t = get_token ();
+    s = t->s;
+    //printf ("name: %s", s);
+    //free (t);
+    if (!is_token (SEMI))
+        alert ("Unexecpt token");
+    return s;
 }
 
 If *get_if ()
@@ -347,17 +380,37 @@ For *get_for ()
 
 List *get_ret ()
 {
-
+    List *l;
+    l = get_rv ();
+    if (!is_token (SEMI))
+        alert ("Unexecpt token, execpt SEMI, ret");
+    return l;
 }
 
-Fun_Cal *get_fun_call (token *t)
+Fun_Cal *get_fun_cal (token *t)
 {
-
+    Fun_Cal *f;
+    char *s;
+    List *l;
+    s = t->s;
+    if (!is_token (LPAR))
+        alert ("Unexecpt token, execpt LPAR, fun_cal");
+    l = get_rv_list ();
+    if (!is_token (RPAR))
+        alert ("Unexecpt token, execpt RPAR, fun_cal");
+    if (!is_token (SEMI))
+        alert ("Unexecpt token, execpt SEMI, fun_cal");
+    f = new_fun_cal (l, s);
+    return f;
 }
 
-char *get_sess ()
+char *get_sess (token *t)
 {
-
+    char *s;
+    s = t->s;
+    if (!is_token (COLON))
+        alert ("Unexecpt token when get session, execpt COLON");
+    return s;
 }
 
 List *get_state_list ()
@@ -367,7 +420,6 @@ List *get_state_list ()
     l = new_list ();
     while (1) {
         t = get_token ();
-        //show_token (t);
         switch (t->type) {
             case MUL:
             case AND:
@@ -375,24 +427,25 @@ List *get_state_list ()
                 break;
             case ID:
                 nt = get_token ();
-                //show_token (t);
                 untoken (nt);
-                if (is_id (t, "goto"))
+                if (is_id (t, "goto")) {
                     insert_tail (l, (void*)get_goto (), STR_GOTO);
-                if (is_id (t, "if"))
+                } else if (is_id (t, "if")) {
                     insert_tail (l, (void*)get_if (), STR_IF);
-                if (is_id (t, "return"))
+                } else if (is_id (t, "return")) {
                     insert_tail (l, (void*)get_ret (), STR_RET);
-                switch (nt->type) {
-                    case LPAR:
-                        insert_tail (l, (void*)get_fun_call(t), STR_FUN_CAL);
+                } else {   
+                    switch (nt->type) {
+                        case LPAR:
+                            insert_tail (l, (void*)get_fun_cal(t), STR_FUN_CAL);
+                            break;
+                        case COLON:
+                            insert_tail (l, (void*)get_sess (t), STR_SESS);
+                            break;
+                        default:
+                            insert_tail (l, (void*)get_assi (t), STR_ASSI);
                         break;
-                    case COLON:
-                        insert_tail (l, (void*)get_sess (t), STR_SESS);
-                        break;
-                    default:
-                        insert_tail (l, (void*)get_assi (t), STR_ASSI);
-                    break;
+                    }
                 }
                 break;
             case RBPAR:
@@ -423,6 +476,7 @@ void sym_chk (List *l1, List *l2)
 
 Func *get_func ()
 {
+    //puts ("get_func");
     Func *f;
     f = new_func ();
     if (is_EOF ()) {
@@ -482,7 +536,7 @@ List *get_program ()
 //        puts ("get func");
         if (!f)
             return l;
-        insert_tail (l, (void*)f, STR_FUNC);
+        insert_sym (l, (void*)f, f->name, STR_FUNC);
     }
     return NULL;
 }

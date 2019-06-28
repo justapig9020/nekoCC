@@ -19,7 +19,9 @@ int  main ()
 {
     List *prog;
     prog = get_program ();
+    puts ("++++ start ++++");
     show_list (prog);
+    puts ("++++  end  ++++");
     return 0;
 }
     

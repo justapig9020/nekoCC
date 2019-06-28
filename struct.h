@@ -72,6 +72,7 @@ If *new_if (List*, List*);
 For *new_for (List*, List*, List*, List*);
 
 void insert_tail (List*, void*, int);
+void insert_sym (List*, void*, char*, int);
 char *type_2_string (int);
 void show_list (List *);
 void show_token (token *);

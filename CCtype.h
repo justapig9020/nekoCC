@@ -27,7 +27,8 @@ enum {
     STR_FOR,
     STR_RET,
     STR_GOTO,
-    STR_TOK
+    STR_TOK,
+    STR_LIST
 };
 
 enum {
