@@ -61,13 +61,13 @@ inline Fun_Cal *new_fun_cal (List *arg, char *n)
     return f;
 }
 
-inline If *new_if (List *c, List* s)
+inline If *new_if (List *c, List *s, If *el)
 {
     If *i;
     i = malloc (sizeof (If));
     i->cmp_list = c;
     i->state_list = s;
-    i->else_if = NULL;
+    i->else_if = el;
     return i;
 }
 

@@ -377,7 +377,9 @@ list *get_cmp ()
 If *get_else()
 {
     If *i, *el;
+    //token *t;
     List *c, *s;
+    List *c = NULL;
 }
 
 If *get_if ()
@@ -385,6 +387,9 @@ If *get_if ()
     If *i, *el;
     token *t;
     List *c, *s;
+    c = NULL;
+    s = NULL;
+    el = NULL;
     if (!is_token (LPAR))
         alert ("Unexecpt token when get if, execpt LPAR");
     c = get_cmp ();
@@ -397,17 +402,19 @@ If *get_if ()
         alert ("Unexecpt token when get if, execpt RBPAR");
      t = get_token ();
      if (is_id (t, "else")) {
+        free (t);
         t = get_token ();
         if (is_id (t,"if")) {
-
+            el = get_if ();
         } else if (t->type == LBPAR) {
-
+            el = get_else ();
         } else {
             alert ("Unexecpt token when get if, execpt IF or LBPAR");
         }
      } else {
          untoken (t);
      }
+     i = new_if (c, s, el) 
      return i;
 }
 

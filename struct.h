@@ -68,7 +68,7 @@ Func *new_func ();
 Lv *new_lv (char*, int);
 Assi *new_assi (Lv *, List *);
 Fun_Cal *new_fun_cal (List *, char *);
-If *new_if (List*, List*);
+If *new_if (List*, List*, If*);
 For *new_for (List*, List*, List*, List*);
 
 void insert_tail (List*, void*, int);
