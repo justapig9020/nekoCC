@@ -9,6 +9,7 @@
 extern token *next_token ();
 
 token *utoken = NULL;
+List *get_state_list ();
 
 void untoken (token *t)
 {
@@ -368,9 +369,46 @@ char *get_goto ()
     return s;
 }
 
-If *get_if ()
+list *get_cmp ()
 {
 
+}
+
+If *get_else()
+{
+    If *i, *el;
+    List *c, *s;
+}
+
+If *get_if ()
+{
+    If *i, *el;
+    token *t;
+    List *c, *s;
+    if (!is_token (LPAR))
+        alert ("Unexecpt token when get if, execpt LPAR");
+    c = get_cmp ();
+    if (!is_token *RPAR)
+        alert ("Unexecpt token when get if, execpt RPAR");
+    if (!is_token *LBPAR)
+        alert ("Unexecpt token when get if, execpt LBPAR");
+    s = *get_state_list ();
+    if (!is_token *RBPAR)
+        alert ("Unexecpt token when get if, execpt RBPAR");
+     t = get_token ();
+     if (is_id (t, "else")) {
+        t = get_token ();
+        if (is_id (t,"if")) {
+
+        } else if (t->type == LBPAR) {
+
+        } else {
+            alert ("Unexecpt token when get if, execpt IF or LBPAR");
+        }
+     } else {
+         untoken (t);
+     }
+     return i;
 }
 
 For *get_for ()
