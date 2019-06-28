@@ -369,7 +369,8 @@ char *get_goto ()
     return s;
 }
 
-list *get_cmp ()
+/*
+List *get_cmp ()
 {
 
 }
@@ -380,11 +381,13 @@ If *get_else()
     //token *t;
     List *c, *s;
     List *c = NULL;
+    return NULL;
 }
+*/
 
 If *get_if ()
 {
-    If *i, *el;
+    /*If *i, *el;
     token *t;
     List *c, *s;
     c = NULL;
@@ -415,7 +418,7 @@ If *get_if ()
          untoken (t);
      }
      i = new_if (c, s, el) 
-     return i;
+     return i;*/
 }
 
 For *get_for ()
