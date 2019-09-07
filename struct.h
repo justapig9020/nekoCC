@@ -62,6 +62,13 @@ typedef struct {
     List *state_list;
 } For;
 
+typedef struct {
+    List *c1;
+    List *c2;
+    token *cmp;
+} Cmp;
+
+
 Decl *new_decl ();
 List *new_list ();
 Func *new_func ();
@@ -77,4 +84,5 @@ char *type_2_string (int);
 void show_list (List *);
 void show_token (token *);
 void show_lv (Lv*);
+
 #endif

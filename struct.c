@@ -146,6 +146,7 @@ char *type_2_string (int y)
             return "char*";
             break;
     }
+    return NULL;
 }
 
 void show_list (List *l)

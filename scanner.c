@@ -30,7 +30,7 @@ int get_garbage (char c)
             return 1;
             break;
         case '/':
-            return get_anno (c);
+            return get_anno ();
             break;
     }
     ungetc (c, stdin);

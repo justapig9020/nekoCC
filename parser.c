@@ -208,6 +208,7 @@ int get_opt_lv (token *t)
             return OPT_BOR;
     }
     alert ("Unexecped operator");
+    return -1;
 }
 
 bool get_opt (List *r, List *l, token *t)
@@ -369,25 +370,101 @@ char *get_goto ()
     return s;
 }
 
-/*
-List *get_cmp ()
+List *get_cmp_val (int *lpar_c)
 {
+    List *stk, *rv;
+    int lt;
+    token *t;
+	Node *ptr, *buf;
+    rv = new_list ();
+    stk = new_list ();
+    lt = -1;
+    while (1) {
+        t = get_token ();
+        switch (t->type) {
+            case ID:
+            case NUM:
+                insert_tail (rv, (void*)t, STR_TOK);
+                break;
+            case AND:
+            case MUL:
+            case PLUS:
+            case MINU:
+                switch (lt) {
+                    case ID:
+                    case NUM:
+                    case ADDR:
+                    case REFE:
+                        get_opt (rv, stk, t);
+                        break;
+                    default:
+                        get_next_id (rv, t->type);
+                        break;
+                }
+                break;
+            case XOR:
+            case OR:
+            case DIV:
+            case MOD:
+            case RPAR:
+            case LPAR:
+                // Last
+                if (!get_opt (rv, stk, t)) { 
+                    untoken (t);
+                    return rv;
+                }
+                break;
+            default:
+                ptr = (stk->head);
+	            while (ptr) {
+		            buf = ptr;
+                    insert_tail (rv, ptr->cont, STR_TOK);
+		            ptr = ptr->next;
+		            free (buf);
+	            }
+                untoken (t);
+                return rv;
+        }
+        if (t->type != RPAR && t->type != LPAR)
+            lt = t->type;
+    }
+    return NULL;
+}
 
+Cmp *get_cmp ()
+
+List *get_cmplist (tok_t endT)
+{
+    List *l;
+    token *t;
+    int lpar_c = 0;
+
+    l = new_list ();
+    t = get_token ();
+    while (t->type != endT) {
+        untoken (t);
+        get_cmp (&lpar_c);          
+        t = get_token ();
+    } 
 }
 
 If *get_else()
 {
-    If *i, *el;
     //token *t;
-    List *c, *s;
-    List *c = NULL;
-    return NULL;
+    List *s;
+    s = NULL;
+    if (!is_token (LBPAR))
+        alert ("Unexecpt token when get if, execpt LBPAR");
+    s = *get_state_list ();
+    if (!is_token (RBPAR))
+        alert ("Unexecpt token when get if, execpt RBPAR");
+    return new_if (NULL, s, NULL);
 }
-*/
+
 
 If *get_if ()
 {
-    /*If *i, *el;
+    If *i, *el;
     token *t;
     List *c, *s;
     c = NULL;
@@ -395,13 +472,13 @@ If *get_if ()
     el = NULL;
     if (!is_token (LPAR))
         alert ("Unexecpt token when get if, execpt LPAR");
-    c = get_cmp ();
-    if (!is_token *RPAR)
+    c = get_cmplist ();
+    if (!is_token (RPAR))
         alert ("Unexecpt token when get if, execpt RPAR");
-    if (!is_token *LBPAR)
+    if (!is_token (LBPAR))
         alert ("Unexecpt token when get if, execpt LBPAR");
     s = *get_state_list ();
-    if (!is_token *RBPAR)
+    if (!is_token (RBPAR))
         alert ("Unexecpt token when get if, execpt RBPAR");
      t = get_token ();
      if (is_id (t, "else")) {
@@ -418,7 +495,7 @@ If *get_if ()
          untoken (t);
      }
      i = new_if (c, s, el) 
-     return i;*/
+     return i;
 }
 
 For *get_for ()
