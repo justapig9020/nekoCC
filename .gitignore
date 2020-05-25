@@ -1,5 +1,5 @@
-test1
-ans
-tags
-main1*
-main
+*
+!*.c
+!*.h
+!Makefile
+!README*
